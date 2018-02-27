@@ -60,6 +60,28 @@ const route = [
       });
     },
   },
-
+  {
+    method: 'GET',
+    path: '/quiz/getQueDb',
+    handler: (request, response) => {
+      Models.ques.findAll().then((data) => {
+        const ques = [];
+        // data = JSON.parse(data);
+        for (let i = 0; i < data.length; i += 1) {
+          const obj = {
+            qid: data[i].qid,
+            que: data[i].que,
+            op1: data[i].op1,
+            op2: data[i].op2,
+            op3: data[i].op3,
+            op4: data[i].op4,
+            ans: data[i].ans,
+          };
+          ques[i] = obj;
+        }
+        response(ques);
+      });
+    },
+  },
 ];
 module.exports = route;
