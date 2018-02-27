@@ -127,6 +127,22 @@ const route = [
       });
     },
   },
+  {
+    method: 'POST',
+    path: '/quiz/saveAns',
+    handler: (request, response) => {
+      Models.users.update({
+        ans: request.payload.ans,
 
+      }, {
+        where: {
+          uname: request.payload.uname,
+          qid: request.payload.qid,
+        },
+      }).then(() => {
+        response({ statusCode: 201 });
+      });
+    },
+  },
 ];
 module.exports = route;
