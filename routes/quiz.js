@@ -38,7 +38,7 @@ const route = [
               op2: ques[i].option2,
               op3: ques[i].option3,
               op4: ques[i].option4,
-              ans: ques.ans,
+              ans: ques[i].ans,
             });
           }
         }).then(() => {
@@ -47,5 +47,19 @@ const route = [
       });
     },
   },
+  {
+    method: 'GET',
+    path: '/quiz/getDbInfo',
+    handler: (request, response) => {
+      Models.ques.findAll().then((arr) => {
+        if (arr.length === 0) {
+          response('0');
+        } else {
+          response('1');
+        }
+      });
+    },
+  },
+
 ];
 module.exports = route;
