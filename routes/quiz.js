@@ -83,5 +83,49 @@ const route = [
       });
     },
   },
+  {
+    method: 'POST',
+    path: '/quiz/checkUser',
+    handler: (request, response) => {
+      Models.scores.findAll({ where: { uname: request.payload.uname } }).then((data) => {
+        let users = [];
+        let scores = [];
+        if (data.length === 0) {
+          Models.scores.create({
+            uname: request.payload.uname,
+            score: '0',
+          }).then(() => {
+            Models.ques.findAll().then((arr) => {
+              const promiseArray = [];
+              for (let i = 0; i < arr.length; i += 1) {
+                promiseArray.push(Models.users.create({
+                  uname: request.payload.uname,
+                  qid: arr[i].qid,
+                  ans: '#',
+                }));
+              }
+              Promise.all(promiseArray).then(() => {
+                Models.users.findAll().then((a) => {
+                  users = a;
+                  Models.scores.findAll().then((ab) => {
+                    scores = ab;
+                    response({ users, scores });
+                  });
+                });
+              });
+            });
+          });
+        } else {
+          Models.users.findAll().then((arr) => {
+            users = arr;
+            Models.scores.findAll().then((s) => {
+              scores = s;
+              response({ users, scores });
+            });
+          });
+        }
+      });
+    },
+  },
 ];
 module.exports = route;
