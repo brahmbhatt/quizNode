@@ -83,6 +83,8 @@ const route = [
                 options[keys[j]] = ques[i][keys[j]];
               }
             }
+            console.log(options.option1);
+            // options = JSON.parse(options);
             Models.questions.create({
               qid: ques[i].questionId,
               que: ques[i].question,
@@ -102,7 +104,7 @@ const route = [
     method: 'GET',
     path: '/quiz/getDbInfo',
     handler: (request, response) => {
-      Models.ques.findAll().then((arr) => {
+      Models.questions.findAll().then((arr) => {
         if (arr.length === 0) {
           response('0');
         } else {
@@ -135,19 +137,21 @@ const route = [
     method: 'POST',
     path: '/quiz/checkUser',
     handler: (request, response) => {
-      Models.scores.findAll({ where: { uname: request.payload.uname } }).then((data) => {
+      console.log('user came', request.payload);
+      const payload = JSON.parse(request.payload);
+      Models.scores.findAll({ where: { uname: payload.uname } }).then((data) => {
         let users = [];
         let scores = [];
         if (data.length === 0) {
           Models.scores.create({
-            uname: request.payload.uname,
+            uname: payload.uname,
             score: '0',
           }).then(() => {
             Models.questions.findAll().then((arr) => {
               const promiseArray = [];
               for (let i = 0; i < arr.length; i += 1) {
                 promiseArray.push(Models.users.create({
-                  uname: request.payload.uname,
+                  uname: payload.uname,
                   qid: arr[i].qid,
                   ans: '#',
                 }));
@@ -179,13 +183,16 @@ const route = [
     method: 'POST',
     path: '/quiz/saveAns',
     handler: (request, response) => {
+      const obj = JSON.parse(request.payload);
+      console.log('payload in saveAns', obj);
+
       Models.users.update({
-        ans: request.payload.ans,
+        ans: obj.ans,
 
       }, {
         where: {
-          uname: request.payload.uname,
-          qid: request.payload.qid,
+          uname: obj.user,
+          qid: obj.qid,
         },
       }).then(() => {
         response({ statusCode: 201 });
@@ -196,12 +203,13 @@ const route = [
     method: 'POST',
     path: '/quiz/saveScore',
     handler: (request, response) => {
+      const obj = JSON.parse(request.payload);
       Models.scores.update({
-        score: request.payload.score,
+        score: obj.score,
 
       }, {
         where: {
-          uname: request.payload.uname,
+          uname: obj.user,
         },
       }).then(() => {
         response({ statusCode: 201 });
